@@ -1,0 +1,310 @@
+japanese,romaji,english_meaning,category,part_of_speech
+予定,yotei,plan; schedule,Everyday life,Noun
+用事,youji,errand; something to do,Everyday life,Noun
+都合,tsugou,convenience; circumstances; availability,Everyday life,Noun
+場合,baai,case; situation,Everyday life,Noun
+機会,kikai,opportunity; chance,Everyday life,Noun
+経験,keiken,experience,Everyday life,Noun
+生活,seikatsu,daily life; lifestyle,Everyday life,Noun
+習慣,shuukan,habit; custom,Everyday life,Noun
+準備,junbi,preparation,Everyday life,Noun
+片付ける,katazukeru,to tidy up; put away,Everyday life,Verb
+間に合う,maniau,to be on time; make it,Everyday life,Verb
+遅れる,okureru,to be late; be delayed,Everyday life,Verb
+間違える,machigaeru,to make a mistake; get wrong,Everyday life,Verb
+忘れ物,wasuremono,something forgotten; lost item,Everyday life,Noun
+落とし物,otoshimono,lost property; something dropped,Everyday life,Noun
+届ける,todokeru,to deliver; to report/hand in,Everyday life,Verb
+受け取る,uketoru,to receive; accept,Everyday life,Verb
+支払う,shiharau,to pay,Everyday life,Verb
+足りる,tariru,to be enough; sufficient,Everyday life,Verb
+余る,amaru,to be left over; remain,Everyday life,Verb
+増える,fueru,to increase; grow,Everyday life,Verb
+減る,heru,to decrease; diminish,Everyday life,Verb
+壊れる,kowareru,to break; be broken,Everyday life,Verb
+直る,naoru,to be fixed; recover,Everyday life,Verb
+直す,naosu,to fix; correct; repair,Everyday life,Verb
+汚れる,yogoreru,to get dirty,Everyday life,Verb
+汚す,yogosu,to make dirty,Everyday life,Verb
+乾く,kawaku,to dry; become dry,Everyday life,Verb
+乾かす,kawakasu,to dry something,Everyday life,Verb
+沸かす,wakasu,to boil (water),Everyday life,Verb
+冷える,hieru,to become cold; get chilled,Everyday life,Verb
+冷やす,hiyasu,to cool; chill something,Everyday life,Verb
+温める,atatameru,to warm; heat something,Everyday life,Verb
+届け出る,todokederu,to submit a notification; report officially,Everyday life,Verb
+引っ越す,hikkosu,to move house,Everyday life,Verb
+暮らす,kurasu,to live; make a living,Everyday life,Verb
+過ごす,sugosu,to spend time,Everyday life,Verb
+迎える,mukaeru,to welcome; go to meet,Everyday life,Verb
+見送る,miokuru,to see someone off,Everyday life,Verb
+間隔,kankaku,interval; spacing,Everyday life,Noun
+途中,tochuu,on the way; halfway; in the middle,Everyday life,Noun
+周り,mawari,surroundings; around,Everyday life,Noun
+近所,kinjo,neighborhood,Everyday life,Noun
+方向,houkou,direction,Everyday life,Noun
+向かい,mukai,opposite side; across from,Everyday life,Noun
+反対,hantai,opposite; disagreement,Everyday life,Noun
+往復,oufuku,round trip,Everyday life,Noun
+片道,katamichi,one way (trip),Everyday life,Noun
+故障,koshou,breakdown; malfunction,Everyday life,Noun
+修理,shuuri,repair,Everyday life,Noun
+無料,muryou,free of charge,Everyday life,Noun/Na-adjective
+有料,yuuryou,paid; fee required,Everyday life,Noun/Na-adjective
+料金,ryoukin,fee; charge,Everyday life,Noun
+現金,genkin,cash,Everyday life,Noun
+小銭,kozeni,coins; small change,Everyday life,Noun
+領収書,ryoushuusho,receipt,Everyday life,Noun
+割引,waribiki,discount,Everyday life,Noun
+売り切れ,urikire,sold out,Everyday life,Noun
+品切れ,shinagire,out of stock,Everyday life,Noun
+返品,henpin,return of goods,Everyday life,Noun
+交換,koukan,exchange; replacement,Everyday life,Noun
+注文,chuumon,order (food/goods),Everyday life,Noun
+予約,yoyaku,reservation; booking,Everyday life,Noun
+満席,manseki,fully booked; no seats available,Everyday life,Noun
+空席,kuuseki,vacant seat,Everyday life,Noun
+順番,junban,turn; order; sequence,Everyday life,Noun
+列,retsu,line; queue,Everyday life,Noun
+並ぶ,narabu,to line up; stand in a row,Everyday life,Verb
+込む,komu,to be crowded; become congested,Everyday life,Verb
+空く,suku,to become less crowded; become available,Everyday life,Verb
+混雑,konzatsu,crowding; congestion,Everyday life,Noun
+故郷,furusato,hometown; home region,Everyday life,Noun
+留守,rusu,absence from home,Everyday life,Noun
+不在,fuzai,absence; being unavailable,Everyday life,Noun
+連絡,renraku,contact; communication,Everyday life,Noun/Verb
+返信,henshin,reply; response,Everyday life,Noun/Verb
+返事,henji,answer; reply,Everyday life,Noun
+確認,kakunin,confirmation; checking,Everyday life,Noun/Verb
+注意,chuui,care; caution; attention,Everyday life,Noun/Verb
+安心,anshin,relief; peace of mind,Everyday life,Noun/Na-adjective
+心配,shinpai,worry; concern,Everyday life,Noun/Na-adjective
+迷惑,meiwaku,trouble; nuisance; inconvenience,Everyday life,Noun/Na-adjective
+遠慮,enryo,restraint; hesitation; holding back,Everyday life,Noun/Verb
+我慢,gaman,patience; endurance,Everyday life,Noun/Verb
+無理,muri,impossible; unreasonable; overdoing it,Everyday life,Noun/Na-adjective
+大丈夫,daijoubu,okay; all right; safe,Everyday life,Na-adjective
+確か,tashika,certain; sure; if I remember correctly,Everyday life,Na-adjective
+確かに,tashika ni,certainly; indeed,Everyday life,Adverb
+急に,kyuu ni,suddenly,Everyday life,Adverb
+突然,totsuzen,suddenly; unexpectedly,Everyday life,Adverb
+しばらく,shibaraku,for a while; a little while,Everyday life,Adverb
+そろそろ,sorosoro,soon; it's about time,Everyday life,Adverb
+たまたま,tamatama,by chance; accidentally,Everyday life,Adverb
+結局,kekkyoku,in the end; after all,Everyday life,Adverb
+別々,betsubetsu,separately; individually,Everyday life,Noun/Na-adjective
+それぞれ,sorezore,each; respectively,Everyday life,Adverb
+例えば,tatoeba,for example,Conversation,Adverb
+つまり,tsumari,in other words; that is,Conversation,Adverb
+要するに,you suru ni,in short; basically,Conversation,Expression
+実は,jitsu wa,actually; to tell the truth,Conversation,Adverb
+本当は,hontou wa,actually; truthfully,Conversation,Adverb
+もちろん,mochiron,of course,Conversation,Adverb
+なるほど,naruhodo,I see; that makes sense,Conversation,Expression
+一応,ichiou,for now; just in case; more or less,Conversation,Adverb
+別に,betsu ni,not particularly; nothing in particular,Conversation,Adverb
+どうせ,douse,anyway; in any case (often negative),Conversation,Adverb
+せっかく,sekkaku,with effort; taking the trouble to,Conversation,Adverb
+わざわざ,wazawaza,going out of one's way to,Conversation,Adverb
+お互い,otagai,each other; one another,Conversation,Noun
+相手,aite,the other person; partner; opponent,Conversation,Noun
+本人,honnin,the person concerned; oneself,Conversation,Noun
+仲間,nakama,companion; teammate; group member,Conversation,Noun
+知り合い,shiriai,acquaintance,Conversation,Noun
+付き合い,tsukiai,social relationship; association; dating,Conversation,Noun
+関係,kankei,relationship; connection,Conversation,Noun
+印象,inshou,impression,Conversation,Noun
+性格,seikaku,personality; character,Conversation,Noun
+態度,taido,attitude; behavior,Conversation,Noun
+様子,yousu,state; appearance; how things are,Conversation,Noun
+雰囲気,funiki,atmosphere; vibe,Conversation,Noun
+気分,kibun,mood; feeling,Conversation,Noun
+感情,kanjou,emotion; feeling,Conversation,Noun
+意見,iken,opinion,Conversation,Noun
+考え,kangae,thought; idea; opinion,Conversation,Noun
+賛成,sansei,agreement; approval; being in favor,Conversation,Noun/Verb
+反対する,hantai suru,to oppose; disagree,Conversation,Verb
+納得する,nattoku suru,to understand and accept; be convinced,Conversation,Verb
+勘違いする,kanchigai suru,to misunderstand; get the wrong idea,Conversation,Verb
+誤解する,gokai suru,to misunderstand; misinterpret,Conversation,Verb
+説明する,setsumei suru,to explain,Conversation,Verb
+伝える,tsutaeru,to convey; tell; communicate,Conversation,Verb
+表す,arawasu,to express; represent,Conversation,Verb
+表現する,hyougen suru,to express,Conversation,Verb
+比べる,kuraberu,to compare,Conversation,Verb
+相談する,soudan suru,to consult; discuss a problem,Conversation,Verb
+誘う,sasou,to invite,Conversation,Verb
+断る,kotowaru,to refuse; turn down,Conversation,Verb
+頼む,tanomu,to ask; request; rely on,Conversation,Verb
+任せる,makaseru,to leave something to someone,Conversation,Verb
+許す,yurusu,to forgive; permit,Conversation,Verb
+謝る,ayamaru,to apologize,Conversation,Verb
+褒める,homeru,to praise; compliment,Conversation,Verb
+叱る,shikaru,to scold,Conversation,Verb
+からかう,karakau,to tease; make fun of,Conversation,Verb
+気に入る,ki ni iru,to like; be pleased with,Conversation,Verb
+気になる,ki ni naru,to be curious; be concerned about,Conversation,Verb
+気がする,ki ga suru,to feel; have a feeling that,Conversation,Expression
+気を付ける,ki o tsukeru,to be careful; take care,Conversation,Expression
+気にする,ki ni suru,to worry about; mind,Conversation,Verb
+思い出す,omoidasu,to remember; recall,Conversation,Verb
+思い込む,omoikomu,to be convinced; assume firmly,Conversation,Verb
+思いつく,omoitsuku,to think of; come up with,Conversation,Verb
+感じる,kanjiru,to feel; sense,Conversation,Verb
+信じる,shinjiru,to believe; trust,Conversation,Verb
+疑う,utagau,to doubt; suspect,Conversation,Verb
+会議,kaigi,meeting,Work and study,Noun
+打ち合わせ,uchiawase,business meeting; discussion,Work and study,Noun
+報告,houkoku,report,Work and study,Noun/Verb
+連絡事項,renraku jikou,announcements; items to communicate,Work and study,Noun
+資料,shiryou,materials; documents,Work and study,Noun
+書類,shorui,documents; paperwork,Work and study,Noun
+提出,teishutsu,submission,Work and study,Noun/Verb
+申請,shinsei,application; request (official),Work and study,Noun/Verb
+承認,shounin,approval; authorization,Work and study,Noun/Verb
+許可,kyoka,permission; approval,Work and study,Noun/Verb
+期限,kigen,deadline; time limit,Work and study,Noun
+締め切り,shimekiri,deadline; closing date,Work and study,Noun
+担当,tantou,person in charge; responsibility,Work and study,Noun/Verb
+責任,sekinin,responsibility,Work and study,Noun
+役割,yakuwari,role; part,Work and study,Noun
+作業,sagyou,task; work; operation,Work and study,Noun/Verb
+業務,gyoumu,business duties; work operations,Work and study,Noun
+勤務,kinmu,work; duty; attendance at work,Work and study,Noun/Verb
+残業,zangyou,overtime work,Work and study,Noun/Verb
+休憩,kyuukei,break; rest,Work and study,Noun/Verb
+出席,shusseki,attendance,Work and study,Noun/Verb
+欠席,kesseki,absence; non-attendance,Work and study,Noun/Verb
+遅刻,chikoku,lateness; being late,Work and study,Noun/Verb
+早退,soutai,leaving early,Work and study,Noun/Verb
+復習,fukushuu,review; revision,Work and study,Noun/Verb
+予習,yoshuu,preparation; preview study,Work and study,Noun/Verb
+練習,renshuu,practice,Work and study,Noun/Verb
+講義,kougi,lecture,Work and study,Noun
+授業,jugyou,class; lesson,Work and study,Noun
+課題,kadai,assignment; task; issue,Work and study,Noun
+成績,seiseki,grades; results; performance,Work and study,Noun
+合格,goukaku,passing an exam,Work and study,Noun/Verb
+不合格,fugoukaku,failure; not passing,Work and study,Noun/Verb
+就職,shuushoku,finding employment; getting a job,Work and study,Noun/Verb
+面接,mensetsu,interview,Work and study,Noun/Verb
+採用,saiyou,hiring; adoption,Work and study,Noun/Verb
+給料,kyuuryou,salary; pay,Work and study,Noun
+休暇,kyuuka,leave; vacation,Work and study,Noun
+出張,shucchou,business trip,Work and study,Noun/Verb
+変更,henkou,change; modification,Work and study,Noun/Verb
+改善,kaizen,improvement,Work and study,Noun/Verb
+解決,kaiketsu,solution; resolution,Work and study,Noun/Verb
+対応,taiou,handling; response; dealing with,Work and study,Noun/Verb
+処理,shori,processing; handling,Work and study,Noun/Verb
+設定,settei,setting; configuration,Work and study,Noun/Verb
+保存,hozon,saving; storage,Work and study,Noun/Verb
+削除,sakujo,deletion,Work and study,Noun/Verb
+登録,touroku,registration; entry,Work and study,Noun/Verb
+更新,koushin,update; renewal,Work and study,Noun/Verb
+共有,kyouyuu,sharing,Work and study,Noun/Verb
+確認する,kakunin suru,to check; confirm,Work and study,Verb
+修正する,shuusei suru,to correct; revise,Work and study,Verb
+提出する,teishutsu suru,to submit; hand in,Work and study,Verb
+報告する,houkoku suru,to report,Work and study,Verb
+原因,genin,cause; reason,General vocabulary,Noun
+理由,riyuu,reason; grounds,General vocabulary,Noun
+結果,kekka,result; consequence,General vocabulary,Noun
+影響,eikyou,influence; effect,General vocabulary,Noun
+効果,kouka,effect; result,General vocabulary,Noun
+目的,mokuteki,purpose; objective,General vocabulary,Noun
+目標,mokuhyou,goal; target,General vocabulary,Noun
+方法,houhou,method; way,General vocabulary,Noun
+手段,shudan,means; measure,General vocabulary,Noun
+条件,jouken,condition; requirement,General vocabulary,Noun
+状況,joukyou,situation; circumstances,General vocabulary,Noun
+状態,joutai,state; condition,General vocabulary,Noun
+問題,mondai,problem; question,General vocabulary,Noun
+解決策,kaiketsusaku,solution; measure to solve a problem,General vocabulary,Noun
+可能性,kanousei,possibility; potential,General vocabulary,Noun
+必要,hitsuyou,necessity; necessary,General vocabulary,Noun/Na-adjective
+重要,juuyou,important; importance,General vocabulary,Na-adjective
+必要性,hitsuyousei,necessity; need,General vocabulary,Noun
+特徴,tokuchou,feature; characteristic,General vocabulary,Noun
+共通,kyoutsuu,common; shared,General vocabulary,Noun/Na-adjective
+個人,kojin,individual; personal,General vocabulary,Noun
+全体,zentai,whole; entire,General vocabulary,Noun
+一部,ichibu,part; portion,General vocabulary,Noun
+部分,bubun,part; section,General vocabulary,Noun
+割合,wariai,ratio; proportion; percentage,General vocabulary,Noun
+程度,teido,degree; extent; level,General vocabulary,Noun
+範囲,han'i,range; scope,General vocabulary,Noun
+内容,naiyou,contents; details,General vocabulary,Noun
+情報,jouhou,information,General vocabulary,Noun
+知識,chishiki,knowledge,General vocabulary,Noun
+技術,gijutsu,technology; skill; technique,General vocabulary,Noun
+能力,nouryoku,ability; capability,General vocabulary,Noun
+才能,sainou,talent; ability,General vocabulary,Noun
+努力,doryoku,effort,General vocabulary,Noun/Verb
+成功,seikou,success,General vocabulary,Noun/Verb
+失敗,shippai,failure; mistake,General vocabulary,Noun/Verb
+発展,hatten,development; growth,General vocabulary,Noun/Verb
+進歩,shinpo,progress; advancement,General vocabulary,Noun/Verb
+変化,henka,change; variation,General vocabulary,Noun/Verb
+発見,hakken,discovery,General vocabulary,Noun/Verb
+発明,hatsumei,invention,General vocabulary,Noun/Verb
+利用,riyou,use; utilization,General vocabulary,Noun/Verb
+活用,katsuyou,practical use; application,General vocabulary,Noun/Verb
+比較,hikaku,comparison,General vocabulary,Noun/Verb
+調査,chousa,investigation; survey,General vocabulary,Noun/Verb
+研究,kenkyuu,research; study,General vocabulary,Noun/Verb
+判断,handan,judgment; decision,General vocabulary,Noun/Verb
+決定,kettei,decision; determination,General vocabulary,Noun/Verb
+選択,sentaku,choice; selection,General vocabulary,Noun/Verb
+意識,ishiki,consciousness; awareness,General vocabulary,Noun/Verb
+関心,kanshin,interest; concern,General vocabulary,Noun
+興味,kyoumi,interest; curiosity,General vocabulary,Noun
+価値,kachi,value; worth,General vocabulary,Noun
+意味,imi,meaning; significance,General vocabulary,Noun
+立場,tachiba,position; standpoint,General vocabulary,Noun
+社会,shakai,society,General vocabulary,Noun
+文化,bunka,culture,General vocabulary,Noun
+環境,kankyou,environment,General vocabulary,Noun
+自然,shizen,nature; natural,General vocabulary,Noun/Na-adjective
+資源,shigen,resources,General vocabulary,Noun
+経済,keizai,economy; economics,General vocabulary,Noun
+政治,seiji,politics,General vocabulary,Noun
+法律,houritsu,law,General vocabulary,Noun
+制度,seido,system; institution,General vocabulary,Noun
+規則,kisoku,rule; regulation,General vocabulary,Noun
+自由,jiyuu,freedom; free,General vocabulary,Noun/Na-adjective
+平等,byoudou,equality; equal,General vocabulary,Noun/Na-adjective
+安全,anzen,safety; safe,General vocabulary,Noun/Na-adjective
+危険,kiken,danger; dangerous,General vocabulary,Noun/Na-adjective
+適切,tekisetsu,appropriate; suitable,General vocabulary,Na-adjective
+正確,seikaku,accurate; precise,General vocabulary,Na-adjective
+複雑,fukuzatsu,complicated; complex,General vocabulary,Na-adjective
+単純,tanjun,simple; straightforward,General vocabulary,Na-adjective
+具体的,gutaiteki,concrete; specific,General vocabulary,Na-adjective
+一般的,ippanteki,general; common,General vocabulary,Na-adjective
+特別,tokubetsu,special; particular,General vocabulary,Na-adjective
+十分,juubun,enough; sufficient,General vocabulary,Na-adjective/Adverb
+不十分,fujuubun,insufficient; inadequate,General vocabulary,Na-adjective
+明らか,akiraka,clear; obvious,General vocabulary,Na-adjective
+確実,kakujitsu,certain; reliable,General vocabulary,Na-adjective
+急激,kyuugeki,rapid; sudden,General vocabulary,Na-adjective
+徐々に,jojo ni,gradually; little by little,General vocabulary,Adverb
+次第に,shidai ni,gradually; as time goes on,General vocabulary,Adverb
+ますます,masumasu,more and more; increasingly,General vocabulary,Adverb
+必ず,kanarazu,certainly; without fail,General vocabulary,Adverb
+必死に,hisshi ni,desperately; with all one's effort,General vocabulary,Adverb
+少なくとも,sukunakutomo,at least,General vocabulary,Adverb
+せいぜい,seizei,at most; at best,General vocabulary,Adverb
+おそらく,osoraku,probably; perhaps,General vocabulary,Adverb
+どうやら,douyara,apparently; it seems,General vocabulary,Adverb
+まるで,marude,as if; just like,General vocabulary,Adverb
+一方,ippou,on the other hand; meanwhile,General vocabulary,Noun/Adverb
+反面,hanmen,on the other hand; opposite aspect,General vocabulary,Noun
+そのうえ,sono ue,moreover; in addition,General vocabulary,Conjunction
+したがって,shitagatte,therefore; accordingly,General vocabulary,Conjunction
+ただし,tadashi,however; provided that,General vocabulary,Conjunction
+ところが,tokoroga,however; even so,General vocabulary,Conjunction
+それなのに,sore nanoni,and yet; despite that,General vocabulary,Conjunction
+ちなみに,chinamini,by the way; incidentally,General vocabulary,Adverb
+なお,nao,furthermore; in addition; still,General vocabulary,Adverb

@@ -1,0 +1,88 @@
+:root {
+  --bg: #0b0b0d;
+  --surface: #131316;
+  --surface-2: #18181c;
+  --line: #222227;
+  --line-strong: #34343c;
+  --text: #f0f0f3;
+  --muted: #b4b4bd;
+  --faint: #8e8e98;
+  --accent: #d6b98a;
+  --good: #8fc9a3;
+  --bad: #d99090;
+
+  /* Poppins for all Latin text; Noto Sans JP only fills in kanji/kana (Poppins has none) */
+  --font: "Poppins", "Noto Sans JP", system-ui, sans-serif;
+  --font-jp: "Poppins", "Noto Sans JP", sans-serif;
+  --pad: clamp(16px, 4vw, 64px);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; }
+
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -20%, #16161a 0%, transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  padding: 28px var(--pad) 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+[lang="ja"] { font-family: var(--font-jp); }
+
+button { font-family: inherit; }
+button:focus-visible, input:focus-visible { outline: 1px solid var(--line-strong); outline-offset: 2px; }
+
+.link {
+  background: none; border: 0; color: var(--faint);
+  font-size: 12px; letter-spacing: .02em; cursor: pointer;
+  transition: color .2s var(--ease);
+}
+.link:hover, .link.on { color: var(--text); }
+
+.btn {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 52px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 14px; font-weight: 500; letter-spacing: .01em;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease), transform .1s;
+}
+.btn:hover { border-color: var(--line-strong); background: var(--surface-2); }
+.btn:active { transform: scale(.985); }
+.btn:disabled { opacity: .35; cursor: default; transform: none; background: var(--surface); border-color: var(--line); }
+.btn.bad:hover { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 35%, var(--line)); }
+.btn.good:hover { color: var(--good); border-color: color-mix(in srgb, var(--good) 35%, var(--line)); }
+
+body, input, button, kbd { font-family: var(--font); }
+
+kbd {
+  font-size: 10px; font-weight: 500;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line-strong); border-radius: 5px;
+  color: var(--faint);
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
