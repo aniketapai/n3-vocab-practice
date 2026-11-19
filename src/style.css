@@ -1,43 +1,66 @@
 :root {
-  --bg: #0b0b0d;
-  --surface: #131316;
-  --surface-2: #18181c;
-  --line: #222227;
-  --line-strong: #34343c;
-  --text: #f0f0f3;
-  --muted: #b4b4bd;
-  --faint: #8e8e98;
-  --accent: #d6b98a;
-  --good: #8fc9a3;
-  --bad: #d99090;
+  /* canvas → shell → card: three steps of purple-tinted dark, like nested phone panels */
+  --bg: #0b0910;
+  --shell: #15121b;
+  --surface: #1d1925;
+  --surface-2: #272130;
+  --surface-3: #332b3e;
+  --line: rgba(214, 196, 255, .07);
+  --line-strong: rgba(214, 196, 255, .14);
 
-  /* Poppins for all Latin text; Noto Sans JP only fills in kanji/kana (Poppins has none) */
+  --text: #f4f1f8;
+  --muted: #aba3b9;
+  --faint: #756c85;
+
+  --accent: #c9bdf5;                 /* soft lavender */
+  --accent-ink: #1a1427;             /* text on the accent */
+  --accent-soft: rgba(201, 189, 245, .12);
+  --accent-line: rgba(201, 189, 245, .28);
+  --good: #d9a3b8;                   /* dusty rose: words being learned */
+  --blink: #ff8fab;                  /* live dots: timers, sync */
+  --blink-soft: rgba(255, 143, 171, .18);
+  --bad: #f0808f;
+
+  --r-shell: 34px;
+  --r-card: 26px;
+  --r-pill: 999px;
+
+  /* Poppins for Latin text; Noto Sans JP fills in kanji/kana */
   --font: "Poppins", "Noto Sans JP", system-ui, sans-serif;
   --font-jp: "Poppins", "Noto Sans JP", sans-serif;
-  --pad: clamp(16px, 4vw, 64px);
+  --pad: clamp(16px, 4vw, 56px);
   --ease: cubic-bezier(.2, .7, .2, 1);
+  --spring: cubic-bezier(.34, 1.4, .5, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { min-height: 100%; }
 
 body {
-  background:
-    radial-gradient(1200px 600px at 50% -20%, #16161a 0%, transparent 60%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font);
   font-size: 14px;
   line-height: 1.5;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
 }
+body::before {
+  /* faint lavender + rose glow at the top so the canvas isn't flat */
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(900px 420px at 85% -10%, rgba(201, 189, 245, .05), transparent 70%),
+    radial-gradient(700px 400px at 0% 0%, rgba(255, 143, 171, .035), transparent 70%);
+}
 
 #app {
   width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   min-height: 100vh;
-  padding: 28px var(--pad) 24px;
+  padding: 24px var(--pad) 28px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -46,11 +69,32 @@ body {
 [lang="ja"] { font-family: var(--font-jp); }
 
 button { font-family: inherit; }
-button:focus-visible, input:focus-visible { outline: 1px solid var(--line-strong); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent-line); outline-offset: 2px;
+}
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+/* ---------- shared building blocks ---------- */
+.shell {
+  background: var(--shell);
+  border: 1px solid var(--line);
+  border-radius: var(--r-shell);
+  padding: 8px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.panel-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  padding: 22px 24px;
+}
+
+.num-xl { font-size: clamp(44px, 5vw, 64px); font-weight: 650; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.num-l  { font-size: 26px; font-weight: 650; letter-spacing: -.035em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.label  { font-size: 12px; color: var(--faint); }
 
 .link {
   background: none; border: 0; color: var(--faint);
-  font-size: 12px; letter-spacing: .02em; cursor: pointer;
+  font-size: 12px; cursor: pointer;
   transition: color .2s var(--ease);
 }
 .link:hover, .link.on { color: var(--text); }
@@ -58,31 +102,44 @@ button:focus-visible, input:focus-visible { outline: 1px solid var(--line-strong
 .btn {
   flex: 1;
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  height: 52px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  height: 52px; padding: 0 22px;
+  background: var(--surface-2);
+  border: 0;
   color: var(--text);
-  font-size: 14px; font-weight: 500; letter-spacing: .01em;
-  border-radius: 14px;
+  font-size: 14px; font-weight: 600; letter-spacing: -.005em;
+  border-radius: var(--r-pill);
   cursor: pointer;
-  transition: border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease), transform .1s;
+  transition: background .2s var(--ease), color .2s var(--ease), transform .15s var(--spring), box-shadow .2s var(--ease);
 }
-.btn:hover { border-color: var(--line-strong); background: var(--surface-2); }
-.btn:active { transform: scale(.985); }
-.btn:disabled { opacity: .35; cursor: default; transform: none; background: var(--surface); border-color: var(--line); }
-.btn.bad:hover { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 35%, var(--line)); }
-.btn.good:hover { color: var(--good); border-color: color-mix(in srgb, var(--good) 35%, var(--line)); }
+.btn:hover { background: var(--surface-3); }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .3; cursor: default; transform: none; background: var(--surface-2); }
+.btn.primary, .btn.good {
+  background: var(--accent); color: var(--accent-ink);
+  box-shadow: 0 6px 20px -12px rgba(201, 189, 245, .3);
+}
+.btn.primary:hover, .btn.good:hover { background: #d8cff9; }
+.btn.primary kbd, .btn.good kbd { border-color: rgba(26, 20, 39, .25); color: rgba(26, 20, 39, .6); }
+.btn.bad:hover { background: color-mix(in srgb, var(--bad) 16%, var(--surface-2)); color: #ffb3ba; }
 
 body, input, button, kbd { font-family: var(--font); }
 
 kbd {
-  font-size: 10px; font-weight: 500;
-  min-width: 18px; height: 18px; padding: 0 5px;
+  font-size: 10.5px; font-weight: 600;
+  min-width: 20px; height: 20px; padding: 0 6px;
   display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--line-strong); border-radius: 5px;
+  border: 1px solid var(--line-strong); border-radius: 6px;
   color: var(--faint);
 }
 
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

@@ -18,6 +18,13 @@ export function markKnown(w) {
   store.set('progress', { ...progress })
 }
 
+// used by undo: put a word's count back to what it was
+export function setKnown(w, n) {
+  if (n > 0) progress[w.jp] = n
+  else delete progress[w.jp]
+  store.set('progress', { ...progress })
+}
+
 export function toggleFav(w) {
   if (favs[w.jp]) delete favs[w.jp]
   else favs[w.jp] = true

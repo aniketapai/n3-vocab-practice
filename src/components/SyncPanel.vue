@@ -133,28 +133,28 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 .panel {
   width: 100%; max-width: 460px;
   display: flex; flex-direction: column; gap: 16px;
-  padding: 24px;
+  padding: 26px;
   background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 20px;
+  border: 8px solid var(--shell);
+  border-radius: 34px;
   box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8);
   animation: rise .25s var(--ease);
 }
 header { display: flex; justify-content: space-between; align-items: center; }
-h2 { font-size: 18px; font-weight: 500; }
-.x { background: none; border: 0; color: var(--faint); font-size: 14px; cursor: pointer; width: 30px; height: 30px; border-radius: 8px; }
-.x:hover { color: var(--text); background: var(--line); }
+h2 { font-size: 24px; font-weight: 700; letter-spacing: -.03em; }
+.x { background: var(--surface-2); border: 0; color: var(--muted); font-size: 13px; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; }
+.x:hover { color: var(--text); background: var(--surface-3); }
 
 .muted { color: var(--muted); font-size: 13.5px; }
 .small { font-size: 12px; color: var(--faint); }
 .err { color: var(--bad); font-size: 12.5px; }
-.note { color: var(--good); font-size: 12.5px; }
+.note { color: var(--accent); font-size: 12.5px; }
 
-.state { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; }
-.state-t { font-size: 14px; font-weight: 500; }
-.led { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
-.led.ok { background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 20%, transparent); }
-.led.syncing { background: var(--accent); animation: pulse 1s infinite alternate; }
+.state { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--surface-2); border-radius: 22px; }
+.state-t { font-size: 15px; font-weight: 650; }
+.led { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
+.led.ok { background: var(--blink); box-shadow: 0 0 0 4px var(--blink-soft); }
+.led.syncing { background: var(--blink); animation: pulse 1s infinite alternate; }
 .led.error { background: var(--bad); }
 .led.pending { background: var(--accent); }
 .lnk { color: var(--text); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
@@ -166,14 +166,17 @@ h2 { font-size: 18px; font-weight: 500; }
 
 .row { display: flex; gap: 10px; align-items: center; }
 .row.tight { gap: 8px; }
-.row .btn { height: 42px; flex: none; padding: 0 18px; font-size: 13px; }
-.row .btn.ghost { background: transparent; }
+.row .btn { height: 44px; flex: none; padding: 0 20px; font-size: 13px; background: var(--accent); color: var(--accent-ink); }
+.row .btn:hover { background: #d8cff9; }
+.row .btn:disabled { background: var(--surface-2); color: var(--muted); }
+.row .btn.ghost { background: var(--surface-2); color: var(--text); }
+.row .btn.ghost:hover { background: var(--surface-3); }
 .row input {
-  flex: 1; min-width: 0; height: 42px; padding: 0 12px;
-  background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
+  flex: 1; min-width: 0; height: 44px; padding: 0 18px;
+  background: var(--shell); border: 1px solid transparent; border-radius: 999px;
   color: var(--text); font: 13px ui-monospace, Consolas, monospace;
 }
-.row input:focus { outline: none; border-color: var(--muted); }
+.row input:focus { outline: none; border-color: var(--accent); }
 
 .divider { height: 1px; background: var(--line); }
 .backup { display: flex; justify-content: space-between; align-items: center; gap: 12px; }

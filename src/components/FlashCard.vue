@@ -68,113 +68,124 @@ defineEmits(['flip', 'fav'])
 .card {
   position: relative;
   flex: 1;
-  min-height: 380px;
+  min-height: 400px;
   display: flex;
   flex-direction: column;
-  padding: clamp(18px, 2vw, 28px) clamp(20px, 2.4vw, 34px);
-  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, .03) inset,
-    0 30px 60px -30px rgba(0, 0, 0, .6);
+  padding: clamp(20px, 2.2vw, 30px) clamp(22px, 2.6vw, 36px);
+  background: var(--surface);
+  border-radius: var(--r-card);
   cursor: pointer;
   user-select: none;
-  transition: border-color .25s var(--ease);
+  overflow: hidden;
+  transition: background .3s var(--ease);
 }
-.card:hover { border-color: var(--line-strong); }
+.card::after {
+  /* soft bloom once the answer is revealed */
+  content: ""; position: absolute; inset: auto -20% -60% -20%; height: 80%;
+  background: radial-gradient(closest-side, rgba(201, 189, 245, .07), transparent);
+  opacity: 0; transition: opacity .5s var(--ease); pointer-events: none;
+}
+.card.flipped::after { opacity: 1; }
+.card:hover { background: #211c2a; }
 
 .top {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  font-size: 11px;
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px;
   color: var(--faint);
-  letter-spacing: .06em;
 }
-.num { font-variant-numeric: tabular-nums; }
-.cat { text-transform: uppercase; letter-spacing: .14em; font-size: 10px; }
-.right { justify-self: end; display: inline-flex; align-items: center; gap: 12px; }
+.num {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-2); border-radius: 999px; padding: 4px 11px;
+}
+.cat { font-size: 12.5px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.right { margin-left: auto; display: inline-flex; align-items: center; gap: 10px; }
 .star {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; margin: -7px -8px -7px 0;
-  background: none; border: 0; border-radius: 9px;
-  color: var(--faint); cursor: pointer;
-  transition: color .2s var(--ease), background .2s var(--ease);
+  width: 38px; height: 38px;
+  background: var(--surface-2); border: 0; border-radius: 50%;
+  color: var(--muted); cursor: pointer;
+  transition: color .2s var(--ease), background .2s var(--ease), transform .2s var(--spring);
 }
 .star path { fill: transparent; transition: fill .2s var(--ease); }
-.star:hover { color: var(--text); background: var(--line); }
-.star.on { color: var(--accent); }
-.star.on path { fill: var(--accent); }
-.dots { display: inline-flex; gap: 5px; }
-.dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--line-strong); transition: background .3s var(--ease); }
+.star:hover { color: var(--text); background: var(--surface-3); }
+.star:active { transform: scale(.88); }
+.star.on { color: var(--accent-ink); background: var(--accent); }
+.star.on path { fill: var(--accent-ink); }
+.dots { display: inline-flex; gap: 4px; padding: 7px 10px; background: var(--surface-2); border-radius: 999px; }
+.dots i { width: 14px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .14); transition: background .3s var(--ease); }
 .dots i.f { background: var(--accent); }
-.mastered { color: var(--accent); text-transform: uppercase; letter-spacing: .14em; font-size: 10px; }
+.mastered {
+  height: 28px; padding: 0 12px; display: inline-flex; align-items: center;
+  border-radius: 999px; background: var(--accent); color: var(--accent-ink);
+  font-size: 11.5px; font-weight: 700;
+}
 
 .body {
+  position: relative; z-index: 1;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 12px 4px;
+  padding: 16px 4px;
 }
 .front, .back { display: flex; flex-direction: column; align-items: center; }
 
 .back {
   opacity: 0;
-  transform: translateY(6px);
-  transition: opacity .35s var(--ease), transform .35s var(--ease);
+  transform: translateY(10px);
+  transition: opacity .35s var(--ease), transform .45s var(--spring);
   pointer-events: none;
 }
 .flipped .back { opacity: 1; transform: none; }
 
-.rule { width: 28px; height: 1px; background: var(--line-strong); margin: 26px 0 22px; }
+.rule { width: 36px; height: 4px; border-radius: 2px; background: var(--accent); margin: 26px 0 22px; }
 
 .jp {
-  font-size: clamp(52px, 7vw, 112px);
-  font-weight: 500;
+  font-size: clamp(56px, 7.4vw, 120px);
+  font-weight: 600;
   line-height: 1.15;
-  letter-spacing: .02em;
+  letter-spacing: .01em;
   word-break: keep-all;
 }
-.jp.sm { font-size: clamp(40px, 4.6vw, 76px); }
+.jp.sm { font-size: clamp(42px, 4.8vw, 80px); }
 
 .en {
-  font-size: clamp(22px, 2.6vw, 40px);
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: -.01em;
-  max-width: 28ch;
+  font-size: clamp(26px, 3vw, 46px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.035em;
+  max-width: 24ch;
   text-wrap: balance;
 }
-.en.sm { font-size: clamp(18px, 1.8vw, 28px); margin-top: 4px; }
+.en.sm { font-size: clamp(20px, 2vw, 30px); margin-top: 6px; letter-spacing: -.025em; }
 
 .ro {
-  font-size: clamp(15px, 1.3vw, 20px);
-  font-weight: 300;
+  font-size: clamp(15px, 1.3vw, 19px);
+  font-weight: 500;
   color: var(--muted);
-  letter-spacing: .04em;
+  letter-spacing: .02em;
   margin-top: 6px;
 }
 .back > .ro:first-of-type { margin-top: 0; }
 
 .pos {
-  margin-top: 16px;
-  font-size: 11px;
+  margin-top: 18px;
+  font-size: 12px; font-weight: 600;
   color: var(--muted);
-  letter-spacing: .04em;
-  padding: 3px 11px;
-  border: 1px solid var(--line-strong);
+  padding: 5px 13px;
+  background: var(--surface-2);
   border-radius: 999px;
 }
 
 .hint {
-  text-align: center;
-  font-size: 11px;
+  position: relative; z-index: 1;
+  align-self: center;
+  font-size: 12px; font-weight: 500;
   color: var(--faint);
-  letter-spacing: .04em;
   transition: opacity .25s var(--ease);
 }
 .flipped .hint { opacity: 0; }

@@ -4,7 +4,7 @@ import FlashCard from './FlashCard.vue'
 import SyncBadge from './SyncBadge.vue'
 import { store } from '../storage.js'
 import {
-  MASTER_AT, favs, known, isMastered, markKnown, toggleFav as toggleFavWord, resetProgressFor,
+  MASTER_AT, favs, known, isMastered, markKnown, setKnown, toggleFav as toggleFavWord, resetProgressFor,
   addLearnTime, markPartDone, partTime, setLearnTotal, partsOf, resetTimesFor, fmtClock, fmtShort
 } from '../state.js'
 
@@ -180,6 +180,7 @@ function build() {
   flipped.value = false
   sessionDone.value = 0
   sessionSize.value = items.length
+  history.value = []
   saveSettings()
 }
 
@@ -218,10 +219,35 @@ function showToast(msg) {
   toastTimer = setTimeout(() => { toast.value = '' }, 1600)
 }
 
+/* ---------- undo (practice) ----------
+   Every answer saves a snapshot first, so a mis-press can be taken back with Ctrl+Z
+   or the Undo button: the card comes back revealed, and its progress is restored.  */
+const history = ref([])
+const UNDO_LIMIT = 50
+
+function undo() {
+  if (mode.value !== 'practice' || pt.over || !history.value.length) return
+  const h = history.value.pop()
+  setKnown(h.word, h.known)
+  queue.value = h.queue
+  i.value = h.i
+  sessionDone.value = h.sessionDone
+  pt.answered = h.answered
+  pt.correct = h.correct
+  if (h.running && !pt.running) pt.running = true
+  flipped.value = true
+  showToast(`Undid ${h.ok ? 'Know' : 'Don’t know'}: ${h.word.jp}`)
+}
+
 function answer(ok) {
   const w = current.value
   if (!w || !flipped.value || pt.over) return
   const q = queue.value
+  history.value.push({
+    word: w, ok, known: known(w), queue: [...q], i: i.value,
+    sessionDone: sessionDone.value, answered: pt.answered, correct: pt.correct, running: pt.running
+  })
+  if (history.value.length > UNDO_LIMIT) history.value.shift()
   pt.answered++
   if (ok) pt.correct++
   if (ok) {
@@ -246,6 +272,8 @@ function resetProgress() {
 function onKey(e) {
   poke()
   if (e.target.tagName === 'INPUT') return
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); undo(); return }
+  if (e.ctrlKey || e.metaKey || e.altKey) return
   if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip() }
   else if (e.key === 'Escape') emit('home')
   else if ((e.key === 'p' || e.key === 'P') && mode.value === 'practice') togglePause()
@@ -284,13 +312,14 @@ onBeforeUnmount(() => {
         <SyncBadge @open="emit('sync')" />
       </div>
 
-      <div class="set-head">
-        <div class="eyebrow">Set {{ set.id }} · {{ set.level }}</div>
+      <div class="shell">
+      <div class="panel-card set-head">
+        <div class="eyebrow"><span>Set {{ set.id }}</span><span class="chip">{{ set.level }}</span></div>
         <h1>{{ set.title }}</h1>
         <div v-if="set.jp" class="set-jp" lang="ja">{{ set.jp }}</div>
       </div>
 
-      <div class="groups">
+      <div class="panel-card groups">
         <div class="group">
           <div class="glabel">Words</div>
           <div class="seg" :class="{ second: s.list === 'fav' }">
@@ -342,8 +371,10 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </div>
+      </div>
 
-      <div class="stats">
+      <div class="shell">
+      <div class="panel-card stats">
         <div class="stat">
           <span class="stat-n gold">{{ masteredInRange }}<small>/{{ rangeWords.length }}</small></span>
           <span class="stat-l">mastered in range</span>
@@ -364,16 +395,19 @@ onBeforeUnmount(() => {
         </template>
       </div>
 
-      <div v-if="mode === 'learn' && parts.length" class="parts">
+      <div v-if="mode === 'learn' && parts.length" class="panel-card parts">
         <div class="glabel">Parts learned</div>
         <ul>
           <li v-for="p in parts" :key="p.key" :class="{ cur: p.key === learnKey }">
-            <span class="p-range">{{ p.from }}–{{ p.to }}</span>
-            <span class="p-n">{{ p.to - p.from + 1 }} words</span>
+            <div class="p-text">
+              <b>Words {{ p.from }}–{{ p.to }}</b>
+              <span>{{ p.to - p.from + 1 }} words{{ p.done ? ' · finished' : '' }}</span>
+            </div>
+            <span v-if="p.key === learnKey" class="now">Now</span>
             <span class="p-time mono">{{ fmtClock(p.key === learnKey ? partSec : p.sec) }}</span>
-            <span class="p-done">{{ p.done ? '✓' : '' }}</span>
           </li>
         </ul>
+      </div>
       </div>
 
       <div class="side-foot">
@@ -385,6 +419,7 @@ onBeforeUnmount(() => {
 
     <!-- stage -->
     <main class="stage">
+      <div class="shell stage-shell">
       <div class="meta">
         <div class="meta-row">
           <span class="meta-left">
@@ -422,7 +457,7 @@ onBeforeUnmount(() => {
             <div><b class="bad">{{ pt.answered - pt.correct }}</b><span>missed</span></div>
             <div><b>{{ pace }}s</b><span>per card</span></div>
           </div>
-          <button class="btn again" @click="build">Go again</button>
+          <button class="btn primary again" @click="build">Go again</button>
         </div>
         <FlashCard
           v-else-if="current"
@@ -441,21 +476,21 @@ onBeforeUnmount(() => {
             <div class="empty-mark">☆</div>
             <h2>No favorites yet</h2>
             <p>Tap the star on any card, or press <kbd>F</kbd>, to add it here.</p>
-            <button class="btn again" @click="setList('all')">Browse all words</button>
+            <button class="btn primary again" @click="setList('all')">Browse all words</button>
           </template>
           <template v-else-if="s.list === 'fav'">
             <div class="empty-mark" lang="ja">良</div>
             <h2>Session complete</h2>
             <p>You went through every favorite in this range.</p>
             <p v-if="pt.answered" class="summary">{{ pt.correct }}/{{ pt.answered }} known · {{ fmtClock(pt.elapsed) }} · {{ pace }}s per card</p>
-            <button class="btn again" @click="build">Practice again</button>
+            <button class="btn primary again" @click="build">Practice again</button>
           </template>
           <template v-else-if="mode === 'practice'">
             <div class="empty-mark" lang="ja">{{ allMastered ? '完' : '良' }}</div>
             <h2>{{ allMastered ? 'Everything mastered' : 'Session complete' }}</h2>
             <p>{{ allMastered ? 'Every word in this range is mastered.' : 'Words you missed came back until you got them.' }}</p>
             <p v-if="pt.answered" class="summary">{{ pt.correct }}/{{ pt.answered }} known · {{ fmtClock(pt.elapsed) }} · {{ pace }}s per card</p>
-            <button v-if="!allMastered" class="btn again" @click="build">Practice again</button>
+            <button v-if="!allMastered" class="btn primary again" @click="build">Practice again</button>
           </template>
           <template v-else>
             <h2>No words in range</h2>
@@ -465,21 +500,30 @@ onBeforeUnmount(() => {
       </Transition>
 
       <div class="actions">
+        <button v-if="mode === 'practice' && !pt.over && history.length" class="btn undo"
+                title="Undo last answer (Ctrl+Z)" aria-label="Undo last answer" @click="undo">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+          </svg>
+          <span class="undo-l">Undo</span>
+        </button>
         <template v-if="pt.over"></template>
         <template v-else-if="current && mode === 'learn'">
           <button class="btn" :disabled="i === 0" @click="prev"><kbd>←</kbd> Previous</button>
-          <button class="btn" :disabled="i >= queue.length - 1" @click="next">Next <kbd>→</kbd></button>
+          <button class="btn primary" :disabled="i >= queue.length - 1" @click="next">Next <kbd>→</kbd></button>
         </template>
         <template v-else-if="current && flipped">
           <button class="btn bad" @click="answer(false)"><kbd>1</kbd> Don’t know</button>
           <button class="btn good" @click="answer(true)"><kbd>2</kbd> Know</button>
         </template>
-        <button v-else-if="current" class="btn" @click="flip"><kbd>Space</kbd> Reveal</button>
+        <button v-else-if="current" class="btn primary" @click="flip"><kbd>Space</kbd> Reveal</button>
+      </div>
       </div>
 
       <div class="shortcuts">
         <span><kbd>F</kbd> favorite</span>
         <span v-if="mode === 'practice'"><kbd>P</kbd> pause timer</span>
+        <span v-if="mode === 'practice'"><kbd>Ctrl</kbd><kbd>Z</kbd> undo</span>
         <span><kbd>Esc</kbd> all sets</span>
       </div>
     </main>
@@ -487,235 +531,278 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* ---------- timers ---------- */
 .mono { font-variant-numeric: tabular-nums; }
-.tick { color: var(--good) !important; margin-left: 6px !important; font-size: 13px; }
-
-.chips {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
-  padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-}
-.chips button {
-  height: 30px; background: none; border: 0; border-radius: 9px;
-  color: var(--faint); font-size: 12px; font-weight: 500; cursor: pointer;
-  transition: color .2s var(--ease), background .2s var(--ease);
-}
-.chips button:hover { color: var(--muted); }
-.chips button.on { background: var(--line); color: var(--text); }
-
-.parts { display: flex; flex-direction: column; gap: 8px; }
-.parts ul { list-style: none; display: flex; flex-direction: column; max-height: 180px; overflow-y: auto; }
-.parts li {
-  display: grid; grid-template-columns: 64px 1fr auto 16px; align-items: center; gap: 10px;
-  padding: 7px 2px; font-size: 12.5px; color: var(--muted);
-  border-bottom: 1px solid var(--line);
-}
-.parts li:last-child { border-bottom: 0; }
-.parts li.cur { color: var(--text); }
-.p-range { font-variant-numeric: tabular-nums; }
-.p-n { font-size: 11.5px; color: var(--faint); }
-.p-time { text-align: right; }
-.p-done { color: var(--good); text-align: center; }
-
-.meta-left { display: inline-flex; align-items: center; gap: 14px; }
-.clock {
-  display: inline-flex; align-items: center; gap: 8px;
-  height: 26px; padding: 0 10px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
-  color: var(--text); font: 500 12px var(--font); font-variant-numeric: tabular-nums;
-}
-.clock .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); animation: blink 2s infinite; }
-.clock.idle, .clock.paused { color: var(--muted); }
-.clock.idle .dot, .clock.paused .dot { background: var(--faint); animation: none; }
-.clock.low { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
-.clock.low .dot { background: var(--bad); }
-.btnclock { cursor: pointer; transition: border-color .2s var(--ease); }
-.btnclock:hover { border-color: var(--line-strong); }
-@keyframes blink { 50% { opacity: .35; } }
-
-.result { display: grid; grid-template-columns: repeat(4, auto); gap: 28px; margin-top: 18px; }
-.result div { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.result b { font-size: 26px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
-.result span { font-size: 11.5px; color: var(--faint); }
-.result b.good { color: var(--good); }
-.result b.bad { color: var(--bad); }
-.summary { margin-top: 10px; color: var(--text) !important; font-variant-numeric: tabular-nums; }
-.side-foot .sep { color: var(--line-strong); margin: 0 8px; font-size: 12px; }
+.tick { color: var(--accent) !important; margin-left: 6px !important; font-size: 14px; }
 
 .study {
   flex: 1;
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  gap: clamp(28px, 3.5vw, 56px);
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 16px;
   align-items: start;
 }
 
 /* ---------- sidebar ---------- */
 .side {
-  position: sticky; top: 28px;
-  display: flex; flex-direction: column; gap: 28px;
+  position: sticky; top: 24px;
+  display: flex; flex-direction: column; gap: 16px;
 }
-.side-top { display: flex; justify-content: space-between; align-items: center; }
+.side-top { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
 .back {
   display: inline-flex; align-items: center; gap: 8px;
-  background: none; border: 0; padding: 0;
-  color: var(--muted); font-size: 13px; cursor: pointer;
-  transition: color .2s var(--ease);
+  height: 38px; padding: 0 16px 0 12px;
+  background: var(--shell); border: 1px solid var(--line); border-radius: 999px;
+  color: var(--muted); font-size: 12.5px; font-weight: 600; cursor: pointer;
+  transition: color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
 }
 .back span { transition: transform .2s var(--ease); }
-.back:hover { color: var(--text); }
+.back:hover { color: var(--text); background: var(--surface); border-color: var(--line-strong); }
 .back:hover span { transform: translateX(-3px); }
 
-.eyebrow { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
-.set-head h1 { font-size: 22px; font-weight: 500; letter-spacing: -.01em; line-height: 1.3; }
-.set-jp { margin-top: 6px; font-size: 15px; color: var(--muted); letter-spacing: .06em; }
+.set-head { padding: 22px 22px 20px; }
+.eyebrow {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; font-weight: 650; color: var(--muted); margin-bottom: 12px;
+}
+.chip { font-size: 11.5px; font-weight: 600; background: var(--surface-2); border-radius: 999px; padding: 4px 11px; }
+.set-head h1 { font-size: 22px; font-weight: 700; letter-spacing: -.03em; line-height: 1.25; }
+.set-jp { margin-top: 4px; font-size: 14px; color: var(--faint); letter-spacing: .04em; }
 
-.groups { display: flex; flex-direction: column; gap: 20px; }
+.groups { display: flex; flex-direction: column; gap: 18px; padding: 20px 18px; }
 .group { display: flex; flex-direction: column; gap: 8px; }
 .glabel {
   display: flex; justify-content: space-between; align-items: center;
-  font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint);
+  padding: 0 4px;
+  font-size: 12.5px; font-weight: 650; color: var(--muted);
 }
 .mini {
-  background: none; border: 0; color: var(--faint); font-size: 11px; letter-spacing: .04em;
-  text-transform: none; cursor: pointer; transition: color .2s var(--ease);
+  background: var(--surface-2); border: 0; border-radius: 999px; padding: 2px 10px;
+  color: var(--muted); font-size: 11.5px; font-weight: 600; cursor: pointer;
+  transition: color .2s var(--ease), background .2s var(--ease);
 }
-.mini:hover { color: var(--text); }
+.mini:hover { color: var(--accent-ink); background: var(--accent); }
 
+/* segmented control = the reference's pill tab bar */
 .seg {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 3px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  padding: 4px;
+  background: var(--shell);
+  border-radius: 999px;
 }
 .seg .pill {
-  position: absolute; top: 3px; bottom: 3px; left: 3px;
-  width: calc(50% - 3px);
-  background: var(--line);
-  border-radius: 9px;
-  transition: transform .3s var(--ease);
+  position: absolute; top: 4px; bottom: 4px; left: 4px;
+  width: calc(50% - 4px);
+  background: var(--accent);
+  border-radius: 999px;
+  transition: transform .35s var(--spring);
 }
 .seg.second .pill { transform: translateX(100%); }
 .seg button {
   position: relative;
-  padding: 7px 10px;
+  height: 34px; padding: 0 10px;
   background: none; border: 0;
   color: var(--faint);
-  font-size: 12.5px; font-weight: 500;
+  font-size: 12.5px; font-weight: 650;
   cursor: pointer; white-space: nowrap;
   transition: color .2s var(--ease);
 }
-.seg button:hover { color: var(--muted); }
-.seg button.on { color: var(--text); }
+.seg button:hover { color: var(--text); }
+.seg button.on { color: var(--accent-ink); }
 .count {
-  margin-left: 4px; padding: 0 6px; border-radius: 6px;
+  margin-left: 4px; padding: 1px 7px; border-radius: 999px;
   font-size: 11px; font-variant-numeric: tabular-nums;
-  background: var(--bg); color: var(--muted);
+  background: var(--surface-2); color: var(--muted);
 }
+.seg button.on .count { background: rgba(26, 20, 39, .14); color: var(--accent-ink); }
 .tag {
-  display: flex; align-items: center; justify-content: center; height: 38px;
-  font-size: 12.5px; color: var(--muted);
-  border: 1px dashed var(--line-strong); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; height: 42px;
+  font-size: 12.5px; font-weight: 600; color: var(--muted);
+  border: 1px dashed var(--line-strong); border-radius: 999px;
 }
 
 .range {
   display: flex; align-items: center; gap: 6px;
-  padding: 4px 12px 4px 4px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  font-size: 12px; color: var(--faint);
+  padding: 4px 16px 4px 4px;
+  background: var(--shell);
+  border-radius: 999px;
+  font-size: 12.5px; color: var(--faint);
 }
 .range input {
-  width: 56px; height: 30px;
-  background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
-  color: var(--text); font: 500 13px var(--font);
+  width: 60px; height: 34px;
+  background: var(--surface-2); border: 1px solid transparent; border-radius: 999px;
+  color: var(--text); font: 650 13.5px var(--font);
   text-align: center; font-variant-numeric: tabular-nums;
-  transition: border-color .2s var(--ease);
+  transition: border-color .2s var(--ease), background .2s var(--ease);
 }
-.range input:hover { border-color: var(--line-strong); }
-.range input:focus { outline: none; border-color: var(--muted); }
+.range input:hover { background: var(--surface-3); }
+.range input:focus { outline: none; border-color: var(--accent); }
 .range .of { margin-left: auto; }
 
 .check {
   display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
-  background: none; border: 0; padding: 4px 0;
-  color: var(--muted); font-size: 12.5px; cursor: pointer;
+  background: none; border: 0; padding: 4px;
+  color: var(--muted); font-size: 12.5px; font-weight: 500; cursor: pointer;
 }
 .check .box {
-  width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--line-strong);
-  transition: background .2s var(--ease), border-color .2s var(--ease);
+  position: relative;
+  width: 34px; height: 20px; border-radius: 999px; background: var(--surface-3);
+  transition: background .25s var(--ease);
+}
+.check .box::after {
+  content: ""; position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px; border-radius: 50%; background: var(--muted);
+  transition: transform .3s var(--spring), background .2s var(--ease);
 }
 .check.on { color: var(--text); }
-.check.on .box { background: var(--accent); border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--bg); }
+.check.on .box { background: var(--accent); }
+.check.on .box::after { transform: translateX(14px); background: var(--accent-ink); }
 
-.stats {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
-  background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+.chips {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px;
+  padding: 4px; background: var(--shell); border-radius: 999px;
 }
-.stat { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; background: var(--surface); }
-.stat-n { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.2; }
-.stat-n small { font-size: 13px; color: var(--faint); font-weight: 400; margin-left: 2px; }
-.stat-l { font-size: 11.5px; color: var(--faint); }
+.chips button {
+  height: 32px; background: none; border: 0; border-radius: 999px;
+  color: var(--faint); font-size: 12px; font-weight: 650; cursor: pointer;
+  transition: color .2s var(--ease), background .2s var(--ease);
+}
+.chips button:hover { color: var(--text); }
+.chips button.on { background: var(--accent); color: var(--accent-ink); }
+
+/* stats: big numbers with small labels */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 12px; padding: 22px; }
+.stat { display: flex; flex-direction: column; gap: 3px; }
+.stat-n { font-size: 30px; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.stat-n small { font-size: 14px; color: var(--faint); font-weight: 600; margin-left: 2px; letter-spacing: -.01em; }
+.stat-l { font-size: 12px; color: var(--faint); }
 .gold { color: var(--accent); }
 
-.side-foot { padding-top: 4px; }
+.parts { display: flex; flex-direction: column; gap: 6px; padding: 18px 18px 10px; }
+.parts ul { list-style: none; display: flex; flex-direction: column; max-height: 220px; overflow-y: auto; padding: 0 4px; }
+.parts li { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); }
+.parts li:first-child { border-top: 0; }
+.p-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.p-text b { font-size: 13.5px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums; }
+.p-text span { font-size: 11.5px; color: var(--faint); }
+.parts li.cur .p-text b { color: var(--text); }
+.p-time { font-size: 16px; font-weight: 700; letter-spacing: -.03em; }
+.now {
+  height: 24px; padding: 0 10px; border-radius: 999px; display: inline-flex; align-items: center;
+  background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 700;
+}
+
+.side-foot { display: flex; justify-content: center; align-items: center; padding-top: 2px; }
+.side-foot .sep { color: var(--faint); margin: 0 10px; font-size: 12px; }
 
 /* ---------- stage ---------- */
 .stage {
-  display: flex; flex-direction: column; gap: 20px;
-  min-height: calc(100vh - 52px);
+  display: flex; flex-direction: column; gap: 14px;
+  min-height: calc(100vh - 48px);
 }
-.meta { display: flex; flex-direction: column; gap: 8px; }
+.stage-shell { flex: 1; }
+.meta { display: flex; flex-direction: column; gap: 12px; padding: 12px 14px 8px; }
 .meta-row {
   display: flex; justify-content: space-between; align-items: center;
-  min-height: 18px; font-size: 12px; color: var(--muted);
+  min-height: 34px; font-size: 13px; font-weight: 600; color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.toast { color: var(--accent); }
-.track { height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; }
-.track i { display: block; height: 100%; background: var(--accent); opacity: .85; border-radius: 2px; transition: width .4s var(--ease); }
+.meta-left { display: inline-flex; align-items: center; gap: 14px; }
+.toast {
+  height: 28px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center;
+  background: var(--accent-soft); color: var(--accent); font-size: 12.5px;
+}
+.track { height: 6px; background: var(--surface); border-radius: 6px; overflow: hidden; }
+.track i {
+  display: block; height: 100%; border-radius: 6px;
+  background: var(--accent);
+  transition: width .5s var(--spring);
+}
+
+.clock {
+  display: inline-flex; align-items: center; gap: 9px;
+  height: 34px; padding: 0 14px;
+  background: var(--surface); border: 0; border-radius: 999px;
+  color: var(--text); font: 700 14px var(--font); letter-spacing: -.01em; font-variant-numeric: tabular-nums;
+}
+.clock .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blink); box-shadow: 0 0 0 3px var(--blink-soft); animation: blink 2s infinite; }
+.clock.idle, .clock.paused { color: var(--muted); }
+.clock.idle .dot, .clock.paused .dot { background: var(--faint); box-shadow: none; animation: none; }
+.clock.low { color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, var(--surface)); }
+.clock.low .dot { background: var(--bad); box-shadow: 0 0 0 3px rgba(240, 128, 143, .2); }
+.btnclock { cursor: pointer; transition: background .2s var(--ease); }
+.btnclock:hover { background: var(--surface-2); }
+@keyframes blink { 50% { opacity: .35; } }
 
 .empty {
-  flex: 1; min-height: 380px;
+  flex: 1; min-height: 400px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 6px; text-align: center; padding: 32px 24px;
-  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
-  border: 1px solid var(--line);
-  border-radius: 24px;
+  background: var(--surface);
+  border-radius: var(--r-card);
 }
-.empty-mark { font-size: 40px; color: var(--accent); margin-bottom: 10px; font-weight: 500; }
-.empty h2 { font-size: 18px; font-weight: 500; }
-.empty p { font-size: 13px; color: var(--muted); max-width: 32ch; }
-.empty .again { flex: none; margin-top: 22px; padding: 0 26px; height: 44px; }
+.empty-mark {
+  width: 76px; height: 76px; border-radius: 50%; margin-bottom: 14px;
+  display: grid; place-items: center;
+  background: var(--accent); color: var(--accent-ink);
+  font-size: 34px; font-weight: 700;
+}
+.empty h2 { font-size: 26px; font-weight: 700; letter-spacing: -.035em; }
+.empty p { font-size: 13.5px; color: var(--muted); max-width: 34ch; }
+.empty .again { flex: none; margin-top: 22px; padding: 0 28px; height: 48px; }
 
-.actions { display: flex; gap: 12px; min-height: 56px; }
-.actions .btn { height: 56px; }
-.shortcuts { display: flex; justify-content: center; gap: 22px; font-size: 11.5px; color: var(--faint); }
-.shortcuts span { display: inline-flex; align-items: center; gap: 6px; }
+.result {
+  display: grid; grid-template-columns: repeat(4, auto); gap: 32px; margin-top: 20px;
+  padding: 18px 28px; background: var(--surface-2); border-radius: 22px;
+}
+.result div { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.result b { font-size: 30px; font-weight: 700; letter-spacing: -.04em; color: var(--text); font-variant-numeric: tabular-nums; }
+.result span { font-size: 12px; color: var(--faint); }
+.result b.good { color: var(--accent); }
+.result b.bad { color: var(--bad); }
+.summary {
+  margin-top: 12px; padding: 8px 16px; border-radius: 999px; background: var(--surface-2);
+  color: var(--text) !important; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+
+/* the "Stop · Pause · Lap" pill row */
+.actions {
+  display: flex; gap: 8px; min-height: 64px;
+  padding: 6px; background: var(--surface); border-radius: 999px;
+}
+.actions:empty { display: none; }
+.actions .btn { height: 52px; }
+.actions .undo { flex: none; padding: 0 20px 0 18px; gap: 8px; color: var(--muted); }
+.actions .undo:hover { color: var(--text); }
+.undo-l { font-size: 13px; }
+.shortcuts kbd + kbd { margin-left: -3px; }
+
+.shortcuts { display: flex; justify-content: center; gap: 22px; font-size: 12px; color: var(--faint); }
+.shortcuts span { display: inline-flex; align-items: center; gap: 7px; }
 
 /* transitions */
-.swap-enter-active, .swap-leave-active { transition: opacity .18s var(--ease), transform .18s var(--ease); }
-.swap-enter-from { opacity: 0; transform: translateY(6px); }
+.swap-enter-active, .swap-leave-active { transition: opacity .2s var(--ease), transform .25s var(--ease); }
+.swap-enter-from { opacity: 0; transform: translateY(8px) scale(.99); }
 .swap-leave-to { opacity: 0; transform: translateY(-4px); }
 .fade-enter-active, .fade-leave-active { transition: opacity .3s var(--ease); }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
 /* ---------- smaller screens: sidebar becomes a top panel ---------- */
-@media (max-width: 960px) {
-  .study { grid-template-columns: 1fr; gap: 24px; }
-  .side { position: static; gap: 20px; }
+@media (max-width: 1000px) {
+  .study { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; }
   .groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .stats { display: none; }
-  .side-foot { order: 10; text-align: center; }
+  .side > .shell:has(.stats) { display: none; }
+  .side-foot { order: 10; }
   .stage { min-height: 0; }
-  .stage :deep(.card), .empty { min-height: 60vh; }
+  .stage :deep(.card), .empty { min-height: 58vh; }
   .shortcuts { display: none; }
 }
 @media (max-width: 560px) {
   .groups { grid-template-columns: 1fr; }
+  .result { grid-template-columns: repeat(2, auto); gap: 16px 28px; }
+  .actions .btn { padding: 0 12px; font-size: 13px; }
+  .actions kbd { display: none; }
 }
 </style>
