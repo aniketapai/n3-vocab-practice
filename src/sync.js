@@ -24,12 +24,14 @@ const LOCAL_TS = 'sync:updatedAt'  // when local data last changed
 
 export const sync = reactive({
   enabled: false,
-  status: 'off',        // off | syncing | ok | error
+  status: 'off',        // off | pending (changes waiting to upload) | syncing | ok | error
   error: '',
+  errorKind: '',        // auth | rate | missing | other
   lastSyncedAt: 0,
   login: ''
 })
 
+const PUSH_EVERY = 20_000          // ms between uploads while you study
 let cfg = store.get(CFG_KEY, null)
 let pushTimer = null
 let applying = false
@@ -101,11 +103,53 @@ async function gh(path, opts = {}) {
       ...(opts.body ? { 'Content-Type': 'application/json' } : {})
     }
   })
-  if (res.status === 401) throw new Error('Token rejected. Check that it is valid and has Gist access.')
-  if (res.status === 403 || res.status === 404) throw new Error('No access to gists. The token needs the "gist" scope / Gists read & write.')
-  if (!res.ok) throw new Error(`GitHub error ${res.status}`)
-  return res.status === 204 ? null : res.json()
+  if (res.ok) return res.status === 204 ? null : res.json()
+
+  // work out *why* GitHub said no, so the message tells you what to do
+  let msg = ''
+  try { msg = (await res.json()).message || '' } catch {}
+  const h = name => res.headers.get(name)
+  const retryAfter = h('retry-after'), reset = h('x-ratelimit-reset')
+
+  if (res.status === 429 || (res.status === 403 && (h('x-ratelimit-remaining') === '0' || retryAfter || /rate limit/i.test(msg)))) {
+    const retryAt = retryAfter ? Date.now() + Number(retryAfter) * 1000
+      : reset ? Number(reset) * 1000
+      : Date.now() + 60_000
+    throw new GhError(
+      `GitHub is limiting requests for a moment. Your progress is saved here and will upload automatically at ${new Date(retryAt).toLocaleTimeString()}.`,
+      { kind: 'rate', retryAt }
+    )
+  }
+  if (res.status === 401) {
+    throw new GhError('GitHub rejected the token (it may be expired or revoked). Disconnect, then connect with a new token.', { kind: 'auth' })
+  }
+  if (res.status === 403 || res.status === 404) {
+    const scopes = h('x-oauth-scopes')          // only present for classic tokens
+    if (scopes !== null && !scopes.split(/,\s*/).includes('gist')) {
+      throw new GhError('This token doesn\'t have the "gist" scope. Create a new classic token with only "gist" ticked, then disconnect and connect with it.', { kind: 'auth' })
+    }
+    if (res.status === 404 && /^\/gists\/\w+/.test(path)) {
+      throw new GhError('The sync gist was not found.', { kind: 'missing' })
+    }
+    throw new GhError(
+      `GitHub refused access to gists (${res.status}${msg ? ': ' + msg : ''}). ` +
+      'If this is a fine-grained token, edit it and set Account permissions → Gists → Read and write. ' +
+      'Or use a classic token with only "gist" ticked.',
+      { kind: 'auth' }
+    )
+  }
+  throw new GhError(`GitHub error ${res.status}${msg ? ': ' + msg : ''}`, { kind: 'other' })
 }
+
+class GhError extends Error {
+  constructor(message, { kind, retryAt } = {}) {
+    super(message)
+    this.kind = kind
+    this.retryAt = retryAt
+  }
+}
+
+let retryTimer = null
 
 async function findGist() {
   for (let page = 1; page <= 10; page++) {
@@ -149,6 +193,7 @@ async function createGist(data) {
 async function run(fn) {
   sync.status = 'syncing'
   sync.error = ''
+  sync.errorKind = ''
   const started = Date.now()   // changes made while this runs stay "unsynced" and go up next time
   try {
     await fn()
@@ -156,11 +201,31 @@ async function run(fn) {
     cfg.lastSyncedAt = started
     saveCfg()
     sync.lastSyncedAt = Date.now()
-    sync.status = pushTimer ? 'syncing' : 'ok'
+    sync.status = pushTimer ? 'pending' : 'ok'
   } catch (e) {
     sync.status = 'error'
     sync.error = e.message || String(e)
+    sync.errorKind = e.kind || 'other'
+    // temporary GitHub limit: try again by itself once it lifts
+    if (e.kind === 'rate' && cfg?.gistId) {
+      clearTimeout(retryTimer)
+      retryTimer = setTimeout(pull, Math.max(5_000, (e.retryAt || 0) - Date.now() + 2_000))
+    }
   }
+}
+
+// only one sync talks to GitHub at a time; a request made meanwhile runs right after
+let inFlight = null
+let again = false
+function exclusive(fn) {
+  if (inFlight) { again = true; return inFlight }
+  inFlight = (async () => {
+    try { await fn() } finally {
+      inFlight = null
+      if (again) { again = false; exclusive(fn) }
+    }
+  })()
+  return inFlight
 }
 
 export async function connect(token) {
@@ -187,15 +252,31 @@ export async function connect(token) {
 
 export function disconnect() {
   clearTimeout(pushTimer)
+  clearTimeout(retryTimer)
+  pushTimer = null
   cfg = null
   store.del(CFG_KEY)
   Object.assign(sync, { enabled: false, status: 'off', error: '', lastSyncedAt: 0, login: '' })
 }
 
-export async function pull() {
-  if (!cfg?.gistId) return
-  await run(async () => {
-    const remote = await readRemote()
+export function pull() {
+  if (!cfg?.gistId) return Promise.resolve()
+  return exclusive(() => run(reconcile))
+}
+
+async function reconcile() {
+  let remote
+  try {
+    remote = await readRemote()
+  } catch (e) {
+    if (e.kind !== 'missing') throw e
+    // the gist was deleted: look for another one, otherwise start a fresh one from this device
+    cfg.gistId = await findGist()
+    if (!cfg.gistId) cfg.gistId = await createGist(snapshot())
+    saveCfg()
+    remote = await readRemote()
+  }
+  {
     if (!remote) return writeRemote(snapshot())
     const base = cfg.lastSyncedAt || 0
     const localTs = localUpdatedAt()
@@ -212,7 +293,7 @@ export async function pull() {
     } else if (localChanged) {
       await writeRemote(snapshot())
     }
-  })
+  }
 }
 
 // pushing goes through pull(): it checks the cloud first, then uploads or merges
@@ -232,10 +313,11 @@ export function initSync() {
     if (applying) return
     store.set(LOCAL_TS, Date.now())
     if (!cfg?.gistId) return
-    sync.status = 'syncing'
-    // throttle, not debounce: a push already scheduled is kept, so steady studying
-    // (answers, timer saves) still uploads every few seconds instead of never
-    if (!pushTimer) pushTimer = setTimeout(push, 3000)
+    if (sync.status !== 'error') sync.status = 'pending'
+    // throttle, not debounce: a push already scheduled is kept, so steady studying still
+    // uploads regularly. 20s keeps fast practice well under GitHub's gist-edit limits
+    // (~500/hour); leaving or hiding the tab uploads right away.
+    if (!pushTimer) pushTimer = setTimeout(push, PUSH_EVERY)
   })
 
   // flush pending changes when the tab is hidden; pull fresh data when it comes back

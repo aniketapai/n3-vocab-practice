@@ -9,6 +9,7 @@ defineEmits(['open'])
     <span>{{
       !sync.enabled ? 'Sync off'
       : sync.status === 'syncing' ? 'Syncing'
+      : sync.status === 'pending' ? 'Saving soon'
       : sync.status === 'error' ? 'Sync error'
       : 'Synced'
     }}</span>
@@ -28,5 +29,6 @@ defineEmits(['open'])
 .led.ok { background: var(--good); }
 .led.syncing { background: var(--accent); animation: pulse 1s infinite alternate; }
 .led.error { background: var(--bad); }
+.led.pending { background: var(--accent); }
 @keyframes pulse { to { opacity: .4 } }
 </style>

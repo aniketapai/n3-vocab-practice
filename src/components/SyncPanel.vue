@@ -56,15 +56,26 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
           <span class="led" :class="sync.status"></span>
           <div>
             <div class="state-t">
-              {{ sync.status === 'syncing' ? 'Syncing…' : sync.status === 'error' ? 'Sync problem' : 'Synced' }}
+              {{ sync.status === 'syncing' ? 'Syncing…'
+                : sync.status === 'pending' ? 'Changes will upload in a few seconds'
+                : sync.status === 'error' ? (sync.errorKind === 'rate' ? 'Waiting for GitHub' : 'Sync problem')
+                : 'Synced' }}
               <span v-if="sync.login" class="muted">· {{ sync.login }}</span>
             </div>
             <div class="muted small">Last synced {{ when }}</div>
           </div>
         </div>
         <p v-if="sync.error" class="err">{{ sync.error }}</p>
+        <form v-if="sync.errorKind === 'auth'" class="row" @submit.prevent="doConnect">
+          <input v-model="token" type="password" placeholder="Paste a new token (ghp_…)" autocomplete="off" spellcheck="false">
+          <button class="btn" :disabled="busy || !token.trim()">{{ busy ? 'Connecting…' : 'Use token' }}</button>
+        </form>
+        <p v-if="sync.errorKind === 'auth'" class="muted small">
+          <a :href="TOKEN_URL" target="_blank" rel="noopener" class="lnk">Create a classic token</a> with only <b>gist</b> ticked.
+          Nothing on this device is lost, it's merged with the cloud copy when you reconnect.
+        </p>
         <p class="muted small">
-          Progress, favorites and range settings are saved to a private gist on your GitHub account.
+          Progress, favorites, learning times and range settings are saved to a private gist on your GitHub account.
           Open the site on another computer, connect with a token for the same account, and you'll continue where you left off.
         </p>
         <div class="row">
@@ -145,6 +156,8 @@ h2 { font-size: 18px; font-weight: 500; }
 .led.ok { background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 20%, transparent); }
 .led.syncing { background: var(--accent); animation: pulse 1s infinite alternate; }
 .led.error { background: var(--bad); }
+.led.pending { background: var(--accent); }
+.lnk { color: var(--text); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
 
 .steps { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; color: var(--muted); }
 .steps a { color: var(--text); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
